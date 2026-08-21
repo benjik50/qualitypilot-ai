@@ -1,0 +1,36 @@
+# Variables et secrets
+.env
+*.env
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Windows et systèmes
+Thumbs.db
+.DS_Store
+
+# Données locales volumineuses
+postgres_data/
+ollama_data/
+models/
+
+# Logs et fichiers temporaires
+*.log
+logs/
+tmp/
+temp/
