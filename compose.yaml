@@ -16,23 +16,21 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
 
     healthcheck:
       test:
         - CMD-SHELL
-        - pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}
-      interval: 5s
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 10s
 
   ollama:
     image: ollama/ollama:latest
     container_name: qualitypilot-ollama
     restart: unless-stopped
-
-    environment:
-      OLLAMA_HOST: 0.0.0.0:11434
 
     ports:
       - "127.0.0.1:11434:11434"
@@ -45,7 +43,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities:
                 - gpu
 
@@ -85,6 +83,37 @@ services:
         - python
         - -c
         - import urllib.request; urllib.request.urlopen('http://localhost:8000/health')
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+
+    container_name: qualitypilot-mcp
+    restart: unless-stopped
+
+    environment:
+      API_BASE_URL: http://api:8000
+      API_TIMEOUT_SECONDS: 180
+      MCP_URL: http://localhost:8001/mcp
+
+    ports:
+      - "127.0.0.1:8001:8001"
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8001/health')
       interval: 10s
       timeout: 5s
       retries: 10
