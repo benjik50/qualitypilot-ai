@@ -1,0 +1,41 @@
+PROCÉDURE SYNTHÉTIQUE DE GESTION DES NON-CONFORMITÉS FOURNISSEUR
+
+1. Objet
+
+Cette procédure décrit le processus de détection, d'enregistrement, d'analyse et de résolution des non-conformités associées à un fournisseur. Elle s'applique aux matières premières, composants, emballages et prestations reçus sur un site industriel. Les données utilisées dans ce document sont entièrement fictives et servent uniquement à la démonstration du projet QualityPilot AI.
+
+2. Détection d'une non-conformité
+
+Une non-conformité peut être détectée pendant le contrôle à réception, lors de l'utilisation d'un produit en production, pendant une analyse en laboratoire ou à la suite d'une réclamation interne. Le collaborateur qui constate l'écart doit sécuriser le produit concerné, conserver les éléments de preuve disponibles et prévenir le responsable qualité.
+
+Les preuves peuvent comprendre des photographies, des résultats de mesure, des numéros de lot, des certificats d'analyse, des relevés de température ou des échantillons. Les informations doivent être enregistrées de manière factuelle, sans supposer immédiatement la cause du défaut.
+
+3. Classification de la criticité
+
+Une non-conformité mineure ne provoque pas de risque pour la sécurité et n'empêche pas l'utilisation du produit. Elle nécessite néanmoins une correction et un suivi.
+
+Une non-conformité majeure peut perturber la production, provoquer un blocage de lot ou rendre le produit inutilisable. Une analyse des causes et un plan d'actions fournisseur sont obligatoires.
+
+Une non-conformité critique présente un risque potentiel pour la sécurité des personnes, la conformité réglementaire ou la sécurité alimentaire. Le lot doit être immédiatement bloqué. Le responsable qualité, le responsable de production et la direction du site doivent être informés sans délai.
+
+4. Enregistrement de la réclamation
+
+Chaque réclamation reçoit un identifiant unique. L'enregistrement doit contenir le nom du fournisseur, la référence du produit, le numéro de lot, la date de réception, la quantité livrée, la quantité non conforme, la description précise du défaut, le niveau de criticité et les pièces justificatives.
+
+Le fournisseur reçoit une notification comprenant les faits constatés et la date de réponse attendue. Pour une anomalie critique, un accusé de réception est demandé sous vingt-quatre heures. Pour une anomalie majeure, le délai recommandé est de deux jours ouvrés.
+
+5. Analyse des causes
+
+Le fournisseur analyse la cause racine avec une méthode structurée telle que les cinq pourquoi ou le diagramme d'Ishikawa. L'analyse doit distinguer la cause d'apparition du défaut, la cause de non-détection et les éventuelles défaillances du système qualité.
+
+Une réponse limitée à une erreur humaine n'est pas considérée comme suffisante. Le fournisseur doit expliquer pourquoi le processus a permis à cette erreur de se produire et pourquoi les contrôles existants ne l'ont pas détectée.
+
+6. Plan d'actions correctives
+
+Le plan d'actions précise chaque action, son responsable, sa date cible et la preuve attendue. Une action immédiate peut consister à trier les stocks, remplacer un lot ou renforcer temporairement les contrôles. Une action corrective durable peut modifier une instruction, un équipement, une formation, un paramètre de production ou un plan de surveillance.
+
+7. Vérification de l'efficacité
+
+La réclamation peut être clôturée lorsque les actions ont été réalisées et que leur efficacité a été vérifiée. La vérification peut reposer sur plusieurs livraisons conformes, un audit, des résultats de contrôle ou l'absence de récidive pendant une période définie.
+
+Les indicateurs suivis comprennent le nombre de réclamations, le taux de non-conformité, les parties par million, le délai moyen de réponse, le délai moyen de clôture et le taux de récidive. Ces indicateurs contribuent à l'évaluation périodique de la performance fournisseur.
