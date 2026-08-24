@@ -1,3 +1,5 @@
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import psycopg
@@ -19,30 +21,32 @@ def initialize_database() -> None:
         settings.database_url,
         autocommit=True,
     ) as connection:
-        connection.execute(schema_sql)
+        with connection.cursor() as cursor:
+            cursor.execute(schema_sql)
 
 
-def get_connection():
-    connection = psycopg.connect(
-        get_settings().database_url
-    )
-    register_vector(connection)
-    return connection
+@contextmanager
+def get_connection() -> Iterator[psycopg.Connection]:
+    settings = get_settings()
+
+    with psycopg.connect(settings.database_url) as connection:
+        register_vector(connection)
+        yield connection
 
 
 def save_document(
-    name: str,
+    document_name: str,
     content_hash: str,
     chunks: list[str],
     embeddings: list[list[float]],
 ) -> int:
     if len(chunks) != len(embeddings):
         raise ValueError(
-            "Each chunk must have one embedding"
+            "The number of chunks must match the number of embeddings"
         )
 
     with get_connection() as connection:
-        with connection.cursor() as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(
                 """
                 INSERT INTO documents (
@@ -58,17 +62,19 @@ def save_document(
                     updated_at = NOW()
                 RETURNING id
                 """,
-                (name, content_hash, len(chunks)),
+                (
+                    document_name,
+                    content_hash,
+                    len(chunks),
+                ),
             )
 
-            row = cursor.fetchone()
+            document_row = cursor.fetchone()
 
-            if row is None:
-                raise RuntimeError(
-                    "PostgreSQL did not return the document id"
-                )
+            if document_row is None:
+                raise RuntimeError("The document could not be saved")
 
-            document_id = int(row[0])
+            document_id = int(document_row["id"])
 
             cursor.execute(
                 """
@@ -77,6 +83,18 @@ def save_document(
                 """,
                 (document_id,),
             )
+
+            chunk_rows = [
+                (
+                    document_id,
+                    chunk_index,
+                    chunk,
+                    Vector(embedding),
+                )
+                for chunk_index, (chunk, embedding) in enumerate(
+                    zip(chunks, embeddings, strict=True)
+                )
+            ]
 
             cursor.executemany(
                 """
@@ -88,16 +106,7 @@ def save_document(
                 )
                 VALUES (%s, %s, %s, %s)
                 """,
-                [
-                    (
-                        document_id,
-                        index,
-                        chunk,
-                        Vector(embedding),
-                    )
-                    for index, (chunk, embedding)
-                    in enumerate(zip(chunks, embeddings))
-                ],
+                chunk_rows,
             )
 
     return document_id
@@ -105,9 +114,7 @@ def save_document(
 
 def list_documents() -> list[dict]:
     with get_connection() as connection:
-        with connection.cursor(
-            row_factory=dict_row
-        ) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(
                 """
                 SELECT
@@ -122,7 +129,44 @@ def list_documents() -> list[dict]:
                 """
             )
 
-            return [
-                dict(row)
-                for row in cursor.fetchall()
-            ]
+            return [dict(row) for row in cursor.fetchall()]
+
+
+def search_similar_chunks(
+    query_embedding: list[float],
+    limit: int,
+) -> list[dict]:
+    if not query_embedding:
+        return []
+
+    if limit <= 0:
+        raise ValueError("limit must be greater than zero")
+
+    query_vector = Vector(query_embedding)
+
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    dc.id AS chunk_id,
+                    d.name AS document_name,
+                    dc.chunk_index,
+                    dc.content,
+                    (
+                        1 - (dc.embedding <=> %s)
+                    )::double precision AS similarity
+                FROM document_chunks AS dc
+                INNER JOIN documents AS d
+                    ON d.id = dc.document_id
+                ORDER BY dc.embedding <=> %s
+                LIMIT %s
+                """,
+                (
+                    query_vector,
+                    query_vector,
+                    limit,
+                ),
+            )
+
+            return [dict(row) for row in cursor.fetchall()]
